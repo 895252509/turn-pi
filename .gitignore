@@ -1,0 +1,58 @@
+node_modules
+.env
+data/*
+!data/.gitkeep
+data.legacy/
+sessions/
+web/dist/
+
+# 临时代码/文档，随时可清空
+.tmp/
+
+# 运行态：只忽略状态，CARD/lineage/bundles.lock 仍可 review
+runtime/sessions/
+runtime/hub/
+runtime/bundles/
+runtime/**/memory/
+runtime/**/lease.json
+runtime/**/state.json
+runtime/providers.json
+runtime/providers.json.tmp
+runtime/credentials.json
+runtime/credentials.json.tmp
+runtime/credentials.key
+runtime/credentials.key.bak
+runtime/access-token
+runtime/credential-audit.jsonl
+runtime/credential-audit.jsonl.1
+runtime/workspaces.json
+runtime/workspaces.json.*.tmp
+runtime/git-repos.json
+runtime/git-repos.json.*.tmp
+runtime/worktrees/
+runtime/worktrees.json
+runtime/worktrees.json.*.tmp
+runtime/jobs/
+runtime/skillstore/
+runtime/skills.json
+runtime/skills.json.*.tmp
+runtime/skill-market.json
+runtime/skill-market.json.*.tmp
+runtime/skill-translations.json
+runtime/skill-translations.json.*.tmp
+runtime/skill-market-content.json
+runtime/skill-market-content.json.*.tmp
+
+# 平台托管的 MCP 配置（可能含 header/env 里的令牌），只存在于运行态
+runtime/mcp.json
+runtime/mcp.json.*.tmp
+
+# 运行日志：deploy-idle / pull-idle 的滚动日志与搜索审计流水
+runtime/*.log
+runtime/search-audit.jsonl
+runtime/search-audit.jsonl.*
+
+# 会话备份 / 调试草稿 / 配置备份
+sessions.bak.*/
+.scratch/
+*.bak.*

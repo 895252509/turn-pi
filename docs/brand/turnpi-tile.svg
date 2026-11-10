@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Turn Pi — app tile. Same mark, one module of margin on every side.
+
+  Canvas 144 x 144, module 24, mark 120 x 96 inset 12 px. The 12 px margin is
+  exactly half a module, which is the smallest margin that still survives a
+  rounded mask: iOS and macOS clip roughly 12 % off each corner, Android adaptive
+  icons clip more.
+
+  If you need to go bigger than 8 % margin for a specific store, add it here, not in
+  turnpi-icon.svg — the tight crop and the padded tile are deliberately different
+  files. One file cannot serve both: a favicon wastes 8 % of its 16 px on nothing,
+  and an app icon that touches the edge loses its corners to the mask.
+
+  Cream ground because the Pi ghost is black at 28 % — it needs something light to
+  sit on.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144" width="144" height="144"
+     shape-rendering="crispEdges" role="img" aria-label="Turn Pi">
+  <title>Turn Pi</title>
+  <rect x="0" y="0" width="144" height="144" fill="#F6F3EC"/>
+
+  <g fill="#E8432B">
+    <rect x="12" y="24" width="72" height="24"/>
+    <rect x="36" y="48" width="24" height="72"/>
+  </g>
+
+  <g fill="#000000" opacity="0.28">
+    <rect x="36" y="24" width="72" height="24"/>
+    <rect x="84" y="48" width="24" height="24"/>
+    <rect x="36" y="48" width="24" height="72"/>
+    <rect x="60" y="72" width="24" height="24"/>
+    <rect x="108" y="72" width="24" height="48"/>
+  </g>
+</svg>

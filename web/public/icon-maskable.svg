@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Turn Pi — maskable app icon for the web manifest.
+
+  Maskable icons are cropped to an arbitrary shape by the launcher, so all content
+  must sit inside the 80 % safe zone (a centred circle of 80 % diameter). The mark
+  here is 120 wide on a 168 canvas = 71 % of the width, comfortably inside it.
+
+  Neither turnpi-icon.svg (flush, 0 % margin) nor turnpi-tile.svg (8.3 % margin)
+  qualifies — a maskable icon needs its own, more padded artwork. This is that file.
+
+  Canvas 168 x 168, module 24, mark 120 x 96 centred at (24, 36).
+  Ground is cream so the black ghost has something to sit on.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 168 168" width="168" height="168"
+     shape-rendering="crispEdges" role="img" aria-label="Turn Pi">
+  <title>Turn Pi</title>
+  <rect x="0" y="0" width="168" height="168" fill="#F6F3EC"/>
+
+  <g fill="#E8432B">
+    <rect x="24" y="36" width="72" height="24"/>
+    <rect x="48" y="60" width="24" height="72"/>
+  </g>
+
+  <g fill="#000000" opacity="0.28">
+    <rect x="48" y="36" width="72" height="24"/>
+    <rect x="96" y="60" width="24" height="24"/>
+    <rect x="48" y="60" width="24" height="72"/>
+    <rect x="72" y="84" width="24" height="24"/>
+    <rect x="120" y="84" width="24" height="48"/>
+  </g>
+</svg>

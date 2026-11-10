@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Turn Pi — layer 1 + layer 2. Nothing else.
+
+  Read it top to bottom, it is literally two drawings:
+
+      <g filter=…>  the red T, with light   (same geometry as turnpi-t.svg)
+      <g opacity=…> the black Pi on top     (same geometry as turnpi-pi.svg)
+
+  Why the glow: flat, a 28 % black ghost over red reads as "a slightly darker red
+  rectangle" and the layering is invisible. With light underneath, the ghost
+  absorbs it — where Pi overlaps, the halo dims, and Pi's outline becomes a shadow
+  across the light. That is the "盖在上面" read, and it only works because the
+  light is *below* the ghost.
+
+  Glow = native feDropShadow chained three times (see turnpi-t.svg for why not
+  CSS box-shadow). Canvas -16..136 gives 16 units of room; the outer tail of the
+  14-unit spill clips at the viewport edge, which is what a tile/splash wants.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 152 152" width="152" height="152"
+     shape-rendering="crispEdges" role="img" aria-label="Turn Pi">
+  <title>Turn Pi</title>
+
+  <defs>
+    <filter id="turnpi-glow" x="-60%" y="-60%" width="220%" height="220%"
+            filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.5"
+                    flood-color="#FF5030" flood-opacity="1" result="core"/>
+      <feDropShadow in="core" dx="0" dy="0" stdDeviation="7"
+                    flood-color="#E8432B" flood-opacity="0.8" result="light"/>
+      <feDropShadow in="light" dx="0" dy="0" stdDeviation="14"
+                    flood-color="#E8432B" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- layer 1: red T, with light -->
+  <g fill="#E8432B" filter="url(#turnpi-glow)">
+    <rect x="0" y="12" width="72" height="24"/>
+    <rect x="24" y="36" width="24" height="72"/>
+  </g>
+
+  <!-- layer 2: Pi, 28 % black, on top -->
+  <g fill="#000000" opacity="0.28">
+    <rect x="24" y="12" width="72" height="24"/>
+    <rect x="72" y="36" width="24" height="24"/>
+    <rect x="24" y="36" width="24" height="72"/>
+    <rect x="48" y="60" width="24" height="24"/>
+    <rect x="96" y="60" width="24" height="48"/>
+  </g>
+</svg>

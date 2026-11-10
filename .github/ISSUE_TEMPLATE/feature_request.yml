@@ -1,0 +1,45 @@
+name: Feature request
+description: 想要一个现在没有的能力
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 你想解决什么问题
+      description: 先讲场景，再讲你想要的功能——这样更容易找到更省事的做法
+      placeholder: |
+        我在……的时候，每次都要手动……，希望能……
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: 你设想的做法
+      description: 有想法就写，没有也没关系
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: 涉及哪块
+      multiple: true
+      options:
+        - 对话 / 轨迹
+        - Agent 模板
+        - 技能库 / 技能市场
+        - MCP
+        - 凭据
+        - 工作区 / worktree
+        - Git 面板
+        - 右栏（文件 / 预览 / 检索）
+        - 联网搜索
+        - 部署 / 容器
+        - 其他
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: 先确认一下
+      options:
+        - label: 我理解这个项目目前是单用户自托管，不打算做多租户 / RBAC
+          required: false

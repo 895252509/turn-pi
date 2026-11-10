@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+		<title>Turn Pi</title>
+		<meta name="description" content="A web UI for the Pi coding agent." />
+		<meta name="theme-color" content="#F6F3EC" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#16181C" media="(prefers-color-scheme: dark)" />
+		<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+		<!-- iOS 只认 PNG 的 apple-touch-icon，SVG 会被忽略；等有光栅化工具了再补 -->
+		<link rel="apple-touch-icon" href="/icon-tile.svg" />
+		<!-- use-credentials：默认 manifest 请求不带 Cookie（规范里 credentials mode = omit），
+		     服务端又要求 pi_access Cookie，不写就会在控制台报 401。
+		     图标沿用这份凭据设置，所以一并解决。 -->
+		<link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials" />
+
+		<script>
+			(() => {
+				try {
+					// 新键优先；`pi-webchat-theme` 是改名前的老键，留给升级用户。
+					const mode =
+						localStorage.getItem('turnpi-theme') ||
+						localStorage.getItem('pi-webchat-theme') ||
+						'system';
+					const valid = mode === 'light' || mode === 'dark' || mode === 'system';
+					const systemLight = window.matchMedia?.('(prefers-color-scheme: light)')?.matches ?? false;
+					const resolved = !valid || mode === 'system' ? (systemLight ? 'light' : 'dark') : mode;
+					document.documentElement.dataset.theme = resolved;
+					document.documentElement.dataset.themeMode = valid ? mode : 'system';
+					document.documentElement.style.colorScheme = resolved;
+				} catch {}
+			})();
+		</script>
+
+		<!--
+			启动画面全部内联在这里，一个外部请求都不等：
+			CSS 和 JS 都还在下载的时候它就已经画出来了，这才是它存在的意义。
+			不要在 app.css 里写它的样式——那份样式要等打包产物，等于没有。
+		-->
+		<style>
+			#turnpi-splash {
+				position: fixed;
+				inset: 0;
+				z-index: 2147483647;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-direction: column;
+				gap: 22px;
+				transition: opacity 240ms ease;
+				-webkit-user-select: none;
+				user-select: none;
+			}
+			/* 默认深色；data-theme 由上面的内联脚本在任何绘制之前写好 */
+			#turnpi-splash { background: #16181c; color: #edeae3; }
+			html[data-theme='light'] #turnpi-splash { background: #f6f3ec; color: #101010; }
+
+			#turnpi-splash[data-done] { opacity: 0; pointer-events: none; }
+
+			.turnpi-splash-mark {
+				position: relative;
+				/* 144px：viewBox 为光晕留了 16 单位边，墨迹只占 79% 宽 / 63% 高；
+				   96px 盒子实际只有 76×61，大屏上像个小徽标。144 时约 114×91。 */
+				width: 144px;
+				height: 144px;
+				flex: none;
+			}
+			.turnpi-splash-mark svg {
+				display: block;
+				width: 100%;
+				height: 100%;
+				shape-rendering: crispEdges;
+			}
+			/* 两层都在内联 SVG 里：层 1 红 T（带 filter 发光），层 2 黑 Pi 盖上来。
+			   幽灵用 fill="currentColor"，深色主题自动白幽灵、浅色自动黑幽灵。 */
+
+			/*
+				扫光：一条斜向高光在标记的轮廓内滑过。
+				mask 用的是同一组矩形的剪影（data URI），所以光只在字里走，
+				不会糊到背景上——这是"扫光"和"泛光"的区别。
+			*/
+			.turnpi-splash-shine {
+				--silhouette: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%27-16%20-16%20152%20152%27%3E%3Cg%20fill=%27%23000%27%3E%3Crect%20x=%270%27%20y=%2712%27%20width=%2796%27%20height=%2724%27/%3E%3Crect%20x=%2724%27%20y=%2736%27%20width=%2724%27%20height=%2772%27/%3E%3Crect%20x=%2772%27%20y=%2736%27%20width=%2724%27%20height=%2724%27/%3E%3Crect%20x=%2748%27%20y=%2760%27%20width=%2724%27%20height=%2724%27/%3E%3Crect%20x=%2796%27%20y=%2760%27%20width=%2724%27%20height=%2748%27/%3E%3C/g%3E%3C/svg%3E");
+				position: absolute;
+				inset: 0;
+				pointer-events: none;
+				background: linear-gradient(
+					105deg,
+					rgba(255, 255, 255, 0) 34%,
+					rgba(255, 255, 255, 0.92) 50%,
+					rgba(255, 255, 255, 0) 66%
+				);
+				background-size: 300% 100%;
+				background-repeat: no-repeat;
+				background-position: 150% 0;
+				-webkit-mask-image: var(--silhouette);
+				mask-image: var(--silhouette);
+				-webkit-mask-size: 100% 100%;
+				mask-size: 100% 100%;
+				-webkit-mask-repeat: no-repeat;
+				mask-repeat: no-repeat;
+				animation: turnpi-shine 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+			}
+
+			@keyframes turnpi-shine {
+				0% { background-position: 150% 0; }
+				65%, 100% { background-position: -60% 0; }
+			}
+
+			.turnpi-splash-word {
+				font: 600 13px/1 ui-sans-serif, -apple-system, 'Segoe UI', Roboto, sans-serif;
+				letter-spacing: 0.34em;
+				text-transform: uppercase;
+				opacity: 0.72;
+				padding-left: 0.34em; /* 补掉字间距在右边多出的一截，视觉居中 */
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				.turnpi-splash-shine { animation: none; opacity: 0; }
+			}
+		</style>
+	</head>
+	<body>
+		<div id="turnpi-splash" role="status" aria-label="正在加载 Turn Pi">
+			<div class="turnpi-splash-mark">
+				<svg viewBox="-16 -16 152 152" aria-hidden="true" focusable="false">
+					<defs>
+						<!-- 层 1 的光。feDropShadow 是几何滤镜，比 CSS box-shadow 可靠：
+						     后者只作用于 HTML 盒子，前者在任何 SVG 渲染器里都在。 -->
+						<filter id="turnpi-splash-glow" x="-60%" y="-60%" width="220%" height="220%"
+							filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+							<feDropShadow dx="0" dy="0" stdDeviation="2.5"
+								flood-color="#FF5030" flood-opacity="1" result="core" />
+							<feDropShadow in="core" dx="0" dy="0" stdDeviation="7"
+								flood-color="#E8432B" flood-opacity="0.8" result="light" />
+							<feDropShadow in="light" dx="0" dy="0" stdDeviation="14"
+								flood-color="#E8432B" flood-opacity="0.5" />
+						</filter>
+					</defs>
+					<!-- 层 1：红色 T + 光 -->
+					<g fill="#E8432B" filter="url(#turnpi-splash-glow)">
+						<rect x="0" y="12" width="72" height="24" />
+						<rect x="24" y="36" width="24" height="72" />
+					</g>
+					<!-- 层 2：黑色 28% 的 Pi，盖在光上面 -->
+					<g fill="currentColor" opacity="0.28">
+						<rect x="24" y="12" width="72" height="24" />
+						<rect x="72" y="36" width="24" height="24" />
+						<rect x="24" y="36" width="24" height="72" />
+						<rect x="48" y="60" width="24" height="24" />
+						<rect x="96" y="60" width="24" height="48" />
+					</g>
+				</svg>
+				<span class="turnpi-splash-shine" aria-hidden="true"></span>
+			</div>
+			<div class="turnpi-splash-word">Turn Pi</div>
+		</div>
+
+		<noscript>
+			<!-- 启动画面是 fixed + 不透明，会把这段提示整个盖住 —— 必须先关掉它 -->
+			<style>
+				#turnpi-splash { display: none; }
+			</style>
+			<p style="font: 14px/1.6 system-ui; padding: 24px">Turn Pi 需要 JavaScript 才能运行。</p>
+		</noscript>
+
+		<div id="root"></div>
+		<script type="module" src="/src/main.tsx"></script>
+
+		<script>
+			// 应用挂载后由 main.tsx 调用；这里的看门狗保证 JS 崩了也不会把人永久锁在 logo 上。
+			(() => {
+				let done = false;
+				window.__turnpiDismissSplash = () => {
+					if (done) return;
+					done = true;
+					const el = document.getElementById('turnpi-splash');
+					if (!el) return;
+					// 先挂监听再改属性：反过来写就是赌浏览器在下一帧才触发过渡
+					el.addEventListener('transitionend', () => el.remove(), { once: true });
+					el.setAttribute('data-done', '');
+					// 兜底：过渡事件不一定来（被中断 / 减弱动画），600ms 后直接摘掉
+					setTimeout(() => el.remove(), 600);
+				};
+				setTimeout(() => window.__turnpiDismissSplash(), 15000);
+			})();
+		</script>
+	</body>
+</html>

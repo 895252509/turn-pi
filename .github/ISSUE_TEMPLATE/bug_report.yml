@@ -1,0 +1,64 @@
+name: Bug report
+description: 有东西坏了 / 行为和预期不符
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        报 bug 前先跑一遍 `make check` 和 `make check-web`，能省一轮来回。
+        **别贴密钥、token、`.env` 内容**——脱敏后再粘。
+
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+      description: 实际行为 + 你期望的行为
+      placeholder: |
+        我以为会……，实际是……
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 打开 …
+        2. 点 …
+        3. 看到 …
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deploy
+    attributes:
+      label: 怎么跑的
+      options:
+        - docker compose（make up）
+        - docker compose + docker socket（make up-docker）
+        - 本机 node（node server/index.ts）
+        - 其他 / 不确定
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      description: "`git rev-parse --short HEAD` 的输出"
+      placeholder: 20d13e8
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志
+      description: "`make logs` 或浏览器控制台的报错（已脱敏）"
+      render: shell
+
+  - type: input
+    id: env
+    attributes:
+      label: 环境
+      placeholder: Ubuntu 24.04 / Docker 27 / Chrome 130 / 模型 deepseek-v4.1-flash

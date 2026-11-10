@@ -1,0 +1,16 @@
+# 可选叠加层：把宿主 docker socket 挂进容器，让 agent 能 `docker ps / logs / restart`。
+#
+#   docker compose -f docker-compose.yml -f docker-compose.docker.yml up -d --build
+#   （= make up-docker）
+#
+# **这是提权**：socket = 宿主 root（能起特权容器、挂宿主根目录、删任何东西）。
+# 单人自用可以，多人或对外部署别叠这一层。
+# rootless docker：DOCKER_SOCK=/run/user/$(id -u)/docker.sock make up-docker
+#
+# 宿主机路径不存在时 docker 会先把它建成空目录，之后容器里的 CLI 只报 permission denied，
+# 排查起来很像权限问题；所以 make up-docker 会先跑 check-docker-socket 预检。
+
+services:
+  webchat:
+    volumes:
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock

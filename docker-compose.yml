@@ -1,0 +1,72 @@
+name: turn-pi
+
+# 最小可跑：`cp .env.example .env`（填一个模型 key）→ `docker compose up -d --build`
+#
+# 默认值都指向本目录下的 ./data 与 ./runtime，clone 下来不需要改任何路径。
+# 想让 agent 操作宿主 docker（能起容器 = 宿主 root）时，额外叠加 docker-compose.docker.yml：
+#   docker compose -f docker-compose.yml -f docker-compose.docker.yml up -d --build
+#   （即 `make up-docker`）——默认关闭，因为这个挂载是提权。
+
+services:
+  webchat:
+    build:
+      context: .
+      args:
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+        # 默认阿里云镜像站（海外构建 `DEBIAN_MIRROR= make up` 走官方源）。
+        # 注意用 ${DEBIAN_MIRROR-...}（单个短横）：未设置才取默认，显式空串会原样传下去。
+        DEBIAN_MIRROR: ${DEBIAN_MIRROR-http://mirrors.aliyun.com}
+        # docker compose 插件从 docker-ce 镜像站取（github release 国内常连不上）
+        DOCKER_CE_MIRROR: ${DOCKER_CE_MIRROR:-https://mirrors.aliyun.com/docker-ce}
+    image: turn-pi:local
+    container_name: turn-pi
+    restart: unless-stopped
+    ports:
+      - "44100:44100"
+    env_file:
+      - .env
+    environment:
+      PORT: "44100"
+      HOST: "0.0.0.0"
+      # 模型（凭据走 OPENCODE_API_KEY，或设置 → 模型供应商里自填）
+      PI_PROVIDER: ${PI_PROVIDER:-opencode-go}
+      PI_MODEL: ${PI_MODEL:-deepseek-v4.1-flash}
+      # agent 能读的工作区（容器内路径）
+      PI_WORKSPACE: /workspace
+      PI_AGENT_DIR: /root/.pi/agent
+      PI_SESSION_DIR: /sessions
+      PI_TOOLS: ${PI_TOOLS:-read,grep,find,ls,bash,edit,write,codemode}
+      # codemode 的 worker 是「全进程共享」的（默认 2 个），排队超过 60s 脚本直接失败。
+      # 一个 server 进程跑所有会话，这里给大一点。
+      PI_CODEMODE_MAX_WORKERS: ${PI_CODEMODE_MAX_WORKERS:-4}
+      # Vite 构建产物（compose 只挂 dist，不挂源码）
+      PI_WEB_DIR: /app/web/dist
+      PI_RUNTIME_DIR: /runtime
+    volumes:
+      # agent 的工作区。默认 ./data/workspace：不碰宿主别的目录也能先跑起来。
+      # 想让它直接改你的代码：PI_WORKSPACE_PATH=/path/to/projects
+      - ${PI_WORKSPACE_PATH:-./data/workspace}:/workspace
+      # 本项目的代码：server 挂进来才能改完即生效（配合 node --watch）
+      - ./server:/app/server
+      # 前端构建产物。改前端后先 `npm run build:web`（或 make build-web），刷新即可
+      - ./web/dist:/app/web/dist:ro
+      # 运行态根：workspaces/skills/凭据/定时任务/运行日志
+      - ./runtime:/runtime
+      # 对话历史（持久化，容器重建不丢）
+      - ./runtime/sessions:/sessions
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:44100/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        # 显式给一段，避开宿主默认地址池被占满的情况（all predefined address pools fully subnetted）。
+        # 和已有 docker 网络重叠时 up 会报 Pool overlaps，用 TURN_PI_SUBNET 覆盖，不必改文件：
+        #   TURN_PI_SUBNET=10.212.9.0/24 make up
+        - subnet: ${TURN_PI_SUBNET:-10.211.78.0/24}

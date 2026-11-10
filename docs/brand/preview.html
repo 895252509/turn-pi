@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Turn Pi — icon preview</title>
+<style>
+  :root { --ink:#16181C; --paper:#F6F3EC; --line:#DCD5C6; --muted:#7A7364; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:40px 48px 72px; background:var(--paper); color:#101010;
+         font:13px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  h1 { font-size:15px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin:0 0 6px; }
+  .sub { color:var(--muted); margin:0 0 34px; max-width:74ch; }
+  h2 { font-size:11px; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+       color:var(--muted); margin:44px 0 14px; padding-bottom:6px; border-bottom:1px solid var(--line); }
+  .stage { border-radius:12px; padding:28px 32px; background:#fff; border:1px solid var(--line); }
+  .stage.dark { background:var(--ink); border-color:#2A2E36; }
+  .sizes { display:flex; align-items:flex-end; gap:30px; flex-wrap:wrap; }
+  .cell { display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .cell span { font-size:10px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .stage.dark .cell span { color:#8B93A1; }
+  img { display:block; }
+  .trio { display:flex; gap:44px; flex-wrap:wrap; align-items:flex-start; }
+  .trio figure { margin:0; text-align:center; }
+  .trio figcaption { font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+                     color:var(--muted); margin-top:14px; font-weight:600; }
+  .stage.dark .trio figcaption { color:#8B93A1; }
+  .pair { display:flex; gap:52px; }
+  .pair > div { text-align:center; }
+  .pair h3 { font-size:11px; letter-spacing:.1em; text-transform:uppercase; margin:0 0 4px;
+             color:var(--muted); font-weight:600; }
+  .pair p { margin:0 0 16px; font-size:11px; color:var(--muted); }
+  .pair .sizes { gap:22px; }
+  .grid16 { outline:1px dashed rgba(210,47,38,.5); }
+  table { border-collapse:collapse; font-size:12px; }
+  td,th { text-align:left; padding:5px 20px 5px 0; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-weight:500; }
+  .sw { display:inline-block; width:11px; height:11px; margin-right:7px; vertical-align:-1px;
+        border:1px solid rgba(0,0,0,.15); }
+  .note { color:var(--muted); font-size:12px; max-width:74ch; margin:14px 0 0; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px;
+         background:rgba(0,0,0,.06); padding:1px 5px; border-radius:4px; }
+  .stage.dark code { background:rgba(255,255,255,.1); color:#EDEAE3; }
+</style>
+</head>
+<body>
+
+<h1>Turn Pi — icon</h1>
+<p class="sub">Red T, solid. Pi in pure black at 28 %, straight on top. Two colours, one grid.</p>
+
+<h2>Margin: which file for which job</h2>
+<div class="stage">
+  <div class="pair">
+    <div>
+      <h3>turnpi-icon.svg · flush</h3>
+      <p>120 × 120, mark touches left and right. Favicon, tab, inline.</p>
+      <div class="sizes" id="flush"></div>
+    </div>
+    <div>
+      <h3>turnpi-tile.svg · padded</h3>
+      <p>144 × 144, 12 px margin = 8.3 %. App icon, dock, avatar.</p>
+      <div class="sizes" id="padded"></div>
+    </div>
+  </div>
+</div>
+<p class="note">
+  One file cannot do both. A favicon with 8 % margin burns 8 % of 16 px on nothing and the blocks go
+  soft; an app icon that touches the edge has its corners clipped by whatever mask the platform
+  applies — iOS and macOS cut about 12 %, Android adaptive icons more.
+</p>
+
+<h2>Two drawings, stacked</h2>
+<div class="stage">
+  <div class="trio">
+    <figure>
+      <img src="turnpi-t.svg" width="240" height="240" alt="red T with glow">
+      <figcaption>层 1 · 红色 T + 光</figcaption>
+    </figure>
+    <figure>
+      <img src="turnpi-pi.svg" width="240" height="240" alt="translucent Pi">
+      <figcaption>层 2 · 黑 Pi 28%</figcaption>
+    </figure>
+    <figure>
+      <img src="turnpi-icon-glow.svg" width="240" height="240" alt="composite">
+      <figcaption>1 + 2</figcaption>
+    </figure>
+  </div>
+</div>
+<p class="note">
+  就是两张图叠起来：<code>turnpi-t.svg</code> 在下，<code>turnpi-pi.svg</code> 在上。
+  平涂时幽灵只是一块「稍微暗一点的红」，读不出层次；底下有光之后，幽灵吸收的是光，
+  被盖住的地方变暗，Pi 的轮廓就成了打在光上的一道阴影 —— 这才是「盖在上面」。
+  发光用原生 <code>feDropShadow</code> 链式三遍（半径 1.5 / 4 / 7），不是 CSS box-shadow（那只作用于 HTML 盒子）。
+</p>
+
+
+<div class="stage">
+  <div class="trio">
+    <figure>
+      <img src="turnpi-icon.svg" width="248" height="248" alt="flat mark">
+      <figcaption>flat · 平涂</figcaption>
+    </figure>
+    <figure>
+      <img src="turnpi-icon-glow.svg" width="248" height="248" alt="glowing mark">
+      <figcaption>glow · 发光</figcaption>
+    </figure>
+  </div>
+</div>
+<p class="note">
+  平涂时，幽灵只是一块「稍微暗一点的红」，读不出层次。加了光之后，<b>幽灵吸收的是光</b>，
+  被盖住的地方变暗，Pi 的轮廓就变成了一道阴影 —— 这才是「盖在上面」的观感。
+  发光只存在于滤镜里，像素格子没有变，所以还是同一个标记，只是被点亮了。
+</p>
+
+<h2>Why the composite is the hard part</h2>
+<div class="stage">
+  <table>
+    <tr><th>层</th><th>面积</th><th>说明</th></tr>
+    <tr><td>红 T 未被覆盖</td><td>约 10 %</td><td>只有 c0/r0 那一格 —— 唯一纯红的地方</td></tr>
+    <tr><td>红 T 被黑 Pi 覆盖</td><td>约 90 %</td><td>横梁和竖笔都被压成 <code>#A7301F</code></td></tr>
+    <tr><td>光晕（T 外围）</td><td>—</td><td>盖不到，是"被照亮"的唯一证据</td></tr>
+  </table>
+</div>
+<p class="note">
+  所以这个标记真正在表达"光"的，不是 T 本身，而是<b>溢在外面的那圈光晕</b>。
+  主色越亮，光晕越站得住；纯红亮度低，光晕一暗，整张图就塌成一块砖红。
+  这就是为什么这里用暖红而不是正红 —— 不是审美，是让覆盖关系看得见。
+</p>
+
+<h2>Glow at real sizes</h2>
+<div class="stage"><div class="sizes" id="row-glow"></div></div>
+<p class="note">
+  48 px 以下光晕会糊掉字块，所以 favicon 仍然用平涂版（<code>turnpi-icon.svg</code>）。
+  发光版用于启动画面、README 首图、社交预览这类大尺寸场合。
+</p>
+
+<h2>Layers</h2>
+<div class="stage">
+  <div class="trio">
+    <figure>
+      <img src="turnpi-t.svg" width="200" height="200" alt="red T only">
+      <figcaption>1 · red T</figcaption>
+    </figure>
+    <figure>
+      <img src="turnpi-pi.svg" width="200" height="200" alt="Pi ghost only">
+      <figcaption>2 · Pi, black 28 %</figcaption>
+    </figure>
+    <figure>
+      <img src="turnpi-icon.svg" width="200" height="200" alt="composite">
+      <figcaption>1 + 2</figcaption>
+    </figure>
+  </div>
+</div>
+
+<h2>Light ground</h2>
+<div class="stage">
+  <div class="trio">
+    <figure>
+      <img src="turnpi-icon.svg" width="228" height="228" alt="Turn Pi on white">
+      <figcaption>turnpi-icon.svg</figcaption>
+    </figure>
+    <figure>
+      <img src="turnpi-tile.svg" width="200" height="200" alt="tile">
+      <figcaption>turnpi-tile.svg</figcaption>
+    </figure>
+  </div>
+</div>
+
+<h2>Dark ground</h2>
+<div class="stage dark">
+  <div class="trio">
+    <figure>
+      <img src="turnpi-icon-inverse.svg" width="228" height="228" alt="Turn Pi on dark">
+      <figcaption>turnpi-icon-inverse.svg · white 26 %</figcaption>
+    </figure>
+  </div>
+</div>
+<p class="note">
+  Black on a dark ground is invisible, so the dark variant flips the ghost to white at 26 % — black
+  stains the paper, white lifts the ink.
+</p>
+
+<h2>Resolved values</h2>
+<table>
+  <tr><th>Cell</th><th>Layers</th><th>Light ground</th><th>Dark ground</th></tr>
+  <tr><td>c0/r0 — left arm</td><td>red only</td>
+      <td><span class="sw" style="background:#E8432B"></span>#E8432B</td>
+      <td><span class="sw" style="background:#E8432B"></span>#E8432B</td></tr>
+  <tr><td>c1–c2/r0 — crossbar</td><td>red + ghost</td>
+      <td><span class="sw" style="background:#A7301F"></span>#A7301F</td>
+      <td><span class="sw" style="background:#EE7462"></span>#EE7462</td></tr>
+  <tr><td>c1/r1–r3 — stem</td><td>red + ghost</td>
+      <td><span class="sw" style="background:#A7301F"></span>#A7301F</td>
+      <td><span class="sw" style="background:#EE7462"></span>#EE7462</td></tr>
+  <tr><td>c3/r0–r1, c2/r2, c4/r2–r3</td><td>ghost only</td>
+      <td><span class="sw" style="background:#B8B8B8"></span>#B8B8B8</td>
+      <td><span class="sw" style="background:#535457"></span>#535457</td></tr>
+</table>
+<p class="note">
+  <code>c0/r0</code> is the only cell with nothing over it — that single pure-red block keeps the T
+  readable while Pi sits on top of everything else.
+</p>
+
+<h2>Red ladder</h2>
+<div class="stage"><div class="trio" id="ladder"></div></div>
+<p class="note">
+  Current is <code>#E8432B</code> — hue 7.6°, an orange-red pulled back toward red.
+  <b>Why not pure red:</b> the ghost covers about 90 % of the T's area, so what you actually see of the
+  T is the <i>covered</i> colour, and the glow only survives in the halo outside. Pure red
+  (hue 358°) has less luminance, so that surviving halo goes dim and the composite flattens; a
+  slightly orange red keeps the light bright enough that the cover still reads as a shadow on it.
+  Ghost opacity held at 28 % across the row.
+</p>
+
+<h2>Sizes — light</h2>
+<div class="stage"><div class="sizes" id="row-light"></div></div>
+
+<h2>Sizes — dark</h2>
+<div class="stage dark"><div class="sizes" id="row-dark"></div></div>
+
+<script>
+const SIZES = [16, 24, 32, 48, 64, 128];
+function fillRow(id, src, sizes) {
+  const row = document.getElementById(id);
+  for (const px of sizes) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    const img = document.createElement('img');
+    img.src = src;
+    img.width = px; img.height = px;
+    img.alt = 'Turn Pi ' + px + 'px';
+    if (px === 16) img.className = 'grid16';
+    cell.appendChild(img);
+    const label = document.createElement('span');
+    label.textContent = px + 'px';
+    cell.appendChild(label);
+    row.appendChild(cell);
+  }
+}
+fillRow('flush', 'turnpi-icon.svg', [16, 24, 32]);
+fillRow('padded', 'turnpi-tile.svg', [16, 24, 32]);
+fillRow('row-light', 'turnpi-icon.svg', SIZES);
+fillRow('row-glow', 'turnpi-icon-glow.svg', [48, 64, 128, 228]);
+fillRow('row-dark', 'turnpi-icon-inverse.svg', SIZES);
+
+// Red ladder: same composite at four warmth levels.
+const REDS = [
+  ['#E8322A', '2.5° · redder'],
+  ['#E8432B', '7.6° · current'],
+  ['#E2502B', '12° · more orange'],
+  ['#EA5C2E', '15° · orangest'],
+];
+const NS = 'http://www.w3.org/2000/svg';
+const T  = [[0, 12, 72, 24], [24, 36, 24, 72]];
+const PI = [[24, 12, 72, 24], [72, 36, 24, 24], [24, 36, 24, 72], [48, 60, 24, 24], [96, 60, 24, 48]];
+function rect(parent, x, y, w, h, fill, opacity) {
+  const r = document.createElementNS(NS, 'rect');
+  r.setAttribute('x', x); r.setAttribute('y', y);
+  r.setAttribute('width', w); r.setAttribute('height', h);
+  r.setAttribute('fill', fill);
+  if (opacity) r.setAttribute('opacity', opacity);
+  parent.appendChild(r);
+}
+const ladder = document.getElementById('ladder');
+for (const [red, label] of REDS) {
+  const fig = document.createElement('figure');
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 120 120');
+  svg.setAttribute('width', 168);
+  svg.setAttribute('height', 168);
+  svg.setAttribute('shape-rendering', 'crispEdges');
+  for (const [x, y, w, h] of T) rect(svg, x, y, w, h, red);
+  for (const [x, y, w, h] of PI) rect(svg, x, y, w, h, '#000000', 0.28);
+  fig.appendChild(svg);
+  const cap = document.createElement('figcaption');
+  cap.textContent = red + ' · ' + label;
+  fig.appendChild(cap);
+  ladder.appendChild(fig);
+}
+</script>
+
+</body>
+</html>

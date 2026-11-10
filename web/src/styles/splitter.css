@@ -1,0 +1,125 @@
+/*
+ * 列宽拖拽热区：聊天区 / 右栏（target=panel）、上下文列 / 聊天区（target=context）。
+ * 只改 .app 的列宽来源（--panel-w / --ctx-w）并叠加一条不可见的 7px 热区；
+ * 其余视觉完全沿用 app.css。
+ *
+ * 注意：这些 .app 规则必须只在桌面宽度生效，否则会以相同的选择器优先级
+ * 覆盖 app.css 里 @media (max-width: 980px) 的单栏布局（后加载者胜）。
+ */
+
+.app {
+	position: relative;
+}
+
+/*
+ * 上下文列的收放系数：1 = 展开，0 = 收起。
+ * 用 @property 把它注册成 <number>，浏览器才能对自定义属性做插值，
+ * 于是 grid 的列宽 calc(var(--ctx-w) * var(--ctx-f)) 会跟着平滑过渡。
+ * 不支持 @property 的浏览器只是没有动画（直接跳变），布局不受影响。
+ */
+@property --ctx-f {
+	syntax: '<number>';
+	inherits: true;
+	initial-value: 1;
+}
+
+/*
+ * 模块 rail 的宽度：窄条 56px ↔ 宽条 184px。
+ * 同样要 @property 注册成 <length> 才能过渡，否则宽窄切换是硬跳。
+ */
+@property --rail-w {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 56px;
+}
+
+@media (min-width: 981px) {
+	.app {
+		--rail-w: 56px;
+		--panel-w: 460px;
+		--ctx-w: 248px;
+		--ctx-f: 1;
+		grid-template-columns: var(--rail-w) calc(var(--ctx-w) * var(--ctx-f)) minmax(0, 1fr) var(--panel-w);
+		transition: --ctx-f 0.22s ease, --rail-w 0.22s ease;
+	}
+	.app.no-panel {
+		grid-template-columns: var(--rail-w) calc(var(--ctx-w) * var(--ctx-f)) minmax(0, 1fr) 0;
+	}
+	/* 收起：不动轨数，只把系数打到 0，这样列宽可以过渡 */
+	.app.ctx-collapsed {
+		--ctx-f: 0;
+	}
+	.app.view-module {
+		grid-template-columns: var(--rail-w) minmax(0, 1fr);
+	}
+	/* 技能模块：rail + 技能上下文列 + 主面板（没有右栏） */
+	.app.view-skills {
+		grid-template-columns: var(--rail-w) calc(var(--ctx-w) * var(--ctx-f)) minmax(0, 1fr);
+	}
+}
+
+/* 宽条：只改一个变量，所有断点/变体的列模板都跟着走 */
+.app.rail-wide {
+	--rail-w: 184px;
+}
+
+.splitter {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: calc(var(--panel-w) - 3.5px);
+	width: 7px;
+	z-index: 12;
+	cursor: col-resize;
+	touch-action: none;
+	display: flex;
+	justify-content: center;
+	background: transparent;
+	border: 0;
+	padding: 0;
+	outline: none;
+}
+
+/* 上下文列在左，热区贴在它的右边缘 */
+.splitter[data-target='context'] {
+	left: calc(var(--rail-w, 56px) + var(--ctx-w) - 3.5px);
+	right: auto;
+}
+
+.splitter::after {
+	content: '';
+	width: 1px;
+	height: 100%;
+	background: transparent;
+	transition: background 0.15s, box-shadow 0.15s;
+}
+
+.splitter:hover::after,
+.splitter:focus-visible::after,
+.splitter.dragging::after {
+	background: var(--accent);
+	box-shadow: 0 0 0 1px rgba(122, 162, 247, 0.25);
+}
+
+.splitter:focus-visible {
+	outline: none;
+}
+
+/* 右栏收起时没有可拖的东西 */
+.app.no-panel .splitter[data-target='panel'] {
+	display: none;
+}
+
+@media (min-width: 981px) and (max-width: 1439px) {
+	.app {
+		--panel-w: 400px;
+		--ctx-w: 220px;
+	}
+}
+
+@media (max-width: 980px) {
+	/* 移动端两栏是抽屉，列宽由 app.css 覆盖；不显示分隔条 */
+	.splitter {
+		display: none;
+	}
+}

@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# 同一分支连推时取消上一轮，省 runner
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  server:
+    name: server · 语法 / 路由 / 各模块自检
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci --include=dev --no-audit --no-fund
+
+      # 用 Node 自带的 TS 解析器做纯语法检查：和运行时同一套实现
+      - name: 语法（server/**）
+        run: node scripts/check-server.mjs
+
+      # 前端引用的每个 /api 路径必须在后端有路由；/api/chat、/api/abort 等缺失即失败
+      - name: 路由表
+        run: node scripts/check-routes.mjs
+
+      - name: 联网搜索/抓取离线回归
+        run: node scripts/check-search.mjs
+
+      - name: 模块自检
+        env:
+          PI_WORKSPACE: ${{ github.workspace }}/.ci-workspace
+          PI_RUNTIME_DIR: ${{ github.workspace }}/.ci-runtime
+        run: |
+          npm run --silent check:agent-card
+          npm run --silent check:agent-spec
+          npm run --silent check:workspace-tools
+          npm run --silent check:git-panel
+          npm run --silent check:worktree-deps
+          npm run --silent check:worktree-guidance
+
+      # 注意：check:mcp 会真的去连 MCP 服务器，离线环境不返回，所以不放进 CI。
+
+  web:
+    name: web · 类型检查 / 构建 / 冒烟
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci --include=dev --no-audit --no-fund
+
+      - name: 类型检查
+        run: npm run typecheck
+
+      - name: 构建
+        run: npm run build:web
+
+      # happy-dom 跑真实构建产物，不需要浏览器
+      - name: 冒烟
+        run: npm run smoke:web

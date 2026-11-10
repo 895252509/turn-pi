@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Turn Pi — dark-ground version of the tight crop: 120 x 120, flush left/right.
+
+  Black does not exist on a dark ground, so the Pi ghost flips to white at 26 %.
+  Same operation in reverse: black stains the paper, white lifts the ink.
+
+      white .26 over #16181C  -> #535457   (ghost outside the T)
+      white .26 over #E8432B  -> #EE7462   (ghost over the T)
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120"
+     shape-rendering="crispEdges" role="img" aria-label="Turn Pi">
+  <title>Turn Pi</title>
+  <g fill="#E8432B">
+    <rect x="0"  y="12" width="72" height="24"/>
+    <rect x="24" y="36" width="24" height="72"/>
+  </g>
+  <g fill="#FFFFFF" opacity="0.26">
+    <rect x="24" y="12" width="72" height="24"/>
+    <rect x="72" y="36" width="24" height="24"/>
+    <rect x="24" y="36" width="24" height="72"/>
+    <rect x="48" y="60" width="24" height="24"/>
+    <rect x="96" y="60" width="24" height="48"/>
+  </g>
+</svg>

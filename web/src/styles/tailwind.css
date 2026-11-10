@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* shadcn/ui 设计变量：只服务于 shadcn 组件，不参与 app.css 的旧样式。 */
+@layer base {
+	:root {
+		--background: 228 14% 5%;
+		--foreground: 220 18% 92%;
+		--card: 220 15% 9%;
+		--card-foreground: 220 18% 92%;
+		--popover: 220 15% 9%;
+		--popover-foreground: 220 18% 92%;
+		--primary: 220 90% 72%;
+		--primary-foreground: 228 14% 5%;
+		--secondary: 220 13% 13%;
+		--secondary-foreground: 220 18% 92%;
+		--muted: 220 13% 13%;
+		--muted-foreground: 218 10% 59%;
+		--accent: 220 90% 72%;
+		--accent-foreground: 228 14% 5%;
+		--destructive: 353 89% 71%;
+		--destructive-foreground: 228 14% 5%;
+		--border: 220 12% 17%;
+		--input: 220 12% 17%;
+		--ring: 220 90% 72%;
+		--radius: 0.625rem;
+	}
+}

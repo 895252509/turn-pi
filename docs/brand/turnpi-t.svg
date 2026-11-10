@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Turn Pi — layer 1 of 2: the red T, with its light.
+
+  This is the bottom layer. Layer 2 is turnpi-pi.svg, drawn on top of it.
+  Stack the two files and you get turnpi-icon-glow.svg.
+
+  The glow is a native SVG filter, not CSS `box-shadow` / `drop-shadow`:
+  box-shadow only applies to HTML boxes, and a <style> block gets stripped by
+  more renderers than you would expect (some viewers, CMS sanitizers, older
+  GitHub paths). feDropShadow is geometry — it survives everywhere.
+
+  Three passes, chained via `in` so each one widens the previous:
+
+      stdDeviation 2.5  hot core, hugs the strokes      #FF5030  100 %
+      stdDeviation 7    the light itself                #E8432B  80 %
+      stdDeviation 14   the spill onto the background   #E8432B  50 %
+
+  Chaining matters. Three independent shadows would sit on top of each other and
+  read as one flat blob; chained passes compound the alpha and give the falloff a
+  real gradient.
+
+  Filter region is -60 % / 220 % so the 14-unit blur is not clipped by the
+  default -10 % / 120 % box.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 152 152" width="152" height="152"
+     shape-rendering="crispEdges" role="img" aria-label="Turn Pi — T layer">
+  <title>Turn Pi — layer 1 (red T with glow)</title>
+
+  <defs>
+    <filter id="turnpi-t-glow" x="-60%" y="-60%" width="220%" height="220%"
+            filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.5"
+                    flood-color="#FF5030" flood-opacity="1" result="core"/>
+      <feDropShadow in="core" dx="0" dy="0" stdDeviation="7"
+                    flood-color="#E8432B" flood-opacity="0.8" result="light"/>
+      <feDropShadow in="light" dx="0" dy="0" stdDeviation="14"
+                    flood-color="#E8432B" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <g fill="#E8432B" filter="url(#turnpi-t-glow)">
+    <rect x="0" y="12" width="72" height="24"/>
+    <rect x="24" y="36" width="24" height="72"/>
+  </g>
+</svg>

@@ -1,0 +1,325 @@
+/*
+ * MCP 模块：服务器列表 + 编辑表单 + 测试结果。
+ *
+ * 控件口径与其它模块一致，不再自带一份：
+ *   - 主操作按钮（新建服务器 / 保存）→ `Button`（components/ui/button.tsx）的
+ *     `variant="default"`：配色来自组件库，盒子刻度跟这里的 `.ghost` 对齐
+ *     （12px 字 / 8px+11px 内边距，`≤980px` 时一起加高），并排不会一大一小
+ *   - 次级按钮（测试 / 编辑 / 启停 / 删除 / 关闭）→ `Button variant="unstyled"`
+ *     + app.css 的 `.ghost` / `.icon-btn`
+ *   - 下拉 → `.select`（app.css）
+ *   - 输入框/文本域 → `.field-input` / `.field-textarea`（app.css）
+ *   - 标签 → `.badge`（app.css，on/off/draft 修饰符）
+ *   - 提示语 → `.hint`（app.css）
+ * 颜色只走变量 + color-mix，亮色主题不用额外覆写。
+ * `.primary` 这个旧 class 从未在 app.css 里定义，主操作已经改走组件库，别再写回去。
+ */
+
+.mcp-head-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 6px;
+	flex: none;
+}
+.mcp-head-actions button,
+.mcp-action,
+.mcp-form-actions button,
+.mcp-empty button {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+.mcp-head-actions svg,
+.mcp-action svg,
+.mcp-form-actions svg,
+.mcp-empty svg { width: 14px; height: 14px; }
+
+.mcp-body { gap: 12px; }
+
+/* ---------- 文件位置 / 提示条 ---------- */
+.mcp-meta {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 7px;
+	margin: 0;
+	color: var(--muted);
+	font-size: 11px;
+}
+.mcp-meta svg { width: 13px; height: 13px; flex: none; }
+.mcp-meta code {
+	padding: 2px 6px;
+	border: 1px solid var(--line);
+	border-radius: 6px;
+	background: var(--panel-2);
+	color: var(--text);
+	font: 11px var(--mono);
+	word-break: break-all;
+}
+
+.mcp-banner {
+	display: flex;
+	align-items: flex-start;
+	gap: 9px;
+	padding: 10px 12px;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	background: var(--panel);
+	font-size: 11.5px;
+	line-height: 1.55;
+}
+.mcp-banner > svg { width: 15px; height: 15px; flex: none; margin-top: 1px; }
+.mcp-banner strong { display: block; color: var(--text); font-size: 12px; }
+.mcp-banner p { margin: 3px 0 0; color: var(--muted); }
+.mcp-banner ul { margin: 4px 0 0; padding-left: 18px; color: var(--muted); }
+.mcp-banner.warn {
+	border-color: color-mix(in srgb, var(--warn) 40%, var(--line));
+	background: color-mix(in srgb, var(--warn) 9%, transparent);
+}
+.mcp-banner.warn > svg { color: var(--warn); }
+.mcp-banner.err {
+	border-color: color-mix(in srgb, var(--err) 40%, var(--line));
+	background: color-mix(in srgb, var(--err) 9%, transparent);
+}
+.mcp-banner.err > svg,
+.mcp-banner.err strong { color: var(--err); }
+
+/* ---------- 两栏：列表 + 编辑器/说明 ---------- */
+.mcp-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 14px;
+	align-items: start;
+}
+@media (min-width: 1180px) {
+	.mcp-grid { grid-template-columns: minmax(0, 1fr) 380px; }
+	.mcp-editor,
+	.mcp-help { position: sticky; top: 0; }
+}
+.mcp-list { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+/* ---------- 服务器卡片 ---------- */
+.mcp-server {
+	display: flex;
+	flex-direction: column;
+	gap: 7px;
+	padding: 12px 14px;
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	background: var(--panel);
+	min-width: 0;
+}
+.mcp-server.off { opacity: 0.72; }
+.mcp-server-head { display: flex; align-items: flex-start; gap: 9px; }
+.mcp-server-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 26px;
+	height: 26px;
+	margin-top: 1px;
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--accent) 12%, transparent);
+	color: var(--accent);
+}
+.mcp-server-icon svg { width: 14px; height: 14px; }
+.mcp-server-title { flex: 1 1 auto; min-width: 0; }
+.mcp-server-title strong { display: block; color: var(--text); font: 600 13px var(--sans); }
+.mcp-server-title small {
+	display: block;
+	margin-top: 2px;
+	color: var(--muted);
+	font-size: 11px;
+	line-height: 1.45;
+}
+.mcp-badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; flex: none; }
+
+.mcp-command {
+	display: block;
+	padding: 6px 9px;
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	background: var(--panel-2);
+	color: var(--text);
+	font: 11px/1.5 var(--mono);
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+.mcp-prefix { margin: 0; color: var(--muted); font-size: 10.5px; }
+.mcp-prefix code { font: 10.5px var(--mono); }
+
+/* ---------- 测试结果 ---------- */
+.mcp-probe {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 9px 11px;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	background: var(--panel-2);
+}
+.mcp-probe.ok { border-color: color-mix(in srgb, var(--ok) 34%, var(--line)); }
+.mcp-probe.err { border-color: color-mix(in srgb, var(--err) 34%, var(--line)); }
+.mcp-probe-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 11.5px; }
+.mcp-probe-head svg { width: 14px; height: 14px; flex: none; }
+.mcp-probe.ok .mcp-probe-head > svg { color: var(--ok); }
+.mcp-probe.err .mcp-probe-head > svg { color: var(--err); }
+.mcp-probe-head strong { color: var(--text); font-size: 11.5px; }
+.mcp-probe-server { color: var(--muted); font: 10.5px var(--mono); }
+.mcp-probe-error { margin: 0; color: var(--err); font-size: 11px; line-height: 1.5; word-break: break-word; }
+.mcp-stderr {
+	margin: 0;
+	padding: 7px 9px;
+	max-height: 160px;
+	overflow: auto;
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--err) 7%, var(--panel));
+	color: var(--muted);
+	font: 10.5px/1.5 var(--mono);
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+.mcp-tools {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	margin: 0;
+	padding: 0;
+	max-height: 220px;
+	overflow-y: auto;
+}
+.mcp-tools li {
+	display: flex;
+	align-items: baseline;
+	gap: 7px;
+	min-width: 0;
+	font-size: 10.5px;
+	line-height: 1.45;
+}
+.mcp-tools code { flex: none; color: var(--accent); font: 10.5px var(--mono); }
+.mcp-tools span {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: var(--muted);
+}
+
+/* ---------- 卡片操作 ---------- */
+.mcp-server-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+	margin-top: 2px;
+}
+.mcp-action { padding: 4px 8px; font-size: 11px; }
+.mcp-action.danger,
+.mcp-confirm .danger { color: var(--err); }
+.mcp-confirm {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	padding: 3px 4px 3px 9px;
+	border: 1px dashed color-mix(in srgb, var(--err) 45%, var(--line));
+	border-radius: 8px;
+	font-size: 11px;
+	color: var(--muted);
+}
+
+/* ---------- 编辑器 ---------- */
+.mcp-editor {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 13px 14px 14px;
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	background: var(--panel);
+	min-width: 0;
+}
+.mcp-editor-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.mcp-editor-head h2 { margin: 0; font-size: 13.5px; }
+.mcp-editor-head p { margin: 3px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.mcp-editor-head .icon-btn { width: 24px; height: 24px; flex: none; }
+.mcp-editor-head .icon-btn svg { width: 14px; height: 14px; }
+
+.mcp-form { display: flex; flex-direction: column; gap: 9px; }
+.mcp-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.mcp-field > span { color: var(--muted); font-size: 10.5px; }
+.mcp-field > small { color: var(--muted); font-size: 10px; line-height: 1.45; }
+.mcp-field .select { width: 100%; max-width: none; }
+.mcp-form-row { display: flex; align-items: flex-end; gap: 10px; }
+.mcp-form-row .mcp-field { flex: 0 1 140px; }
+.mcp-check {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding-bottom: 7px;
+	color: var(--text);
+	font-size: 11px;
+}
+.mcp-check input { accent-color: var(--accent); }
+.mcp-form-hint { margin: 0; color: var(--warn); font-size: 10.5px; line-height: 1.5; }
+.mcp-form-error { margin: 0; color: var(--err); font-size: 10.5px; line-height: 1.5; }
+.mcp-form-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+
+/* ---------- 说明 / 空态 ---------- */
+.mcp-help {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	padding: 13px 14px;
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	background: var(--panel);
+	font-size: 11px;
+	line-height: 1.6;
+	color: var(--muted);
+}
+.mcp-help h2 { margin: 4px 0 0; color: var(--text); font-size: 12px; }
+.mcp-help ol,
+.mcp-help ul { margin: 0; padding-left: 17px; }
+.mcp-help code { font: 10.5px var(--mono); color: var(--text); }
+.mcp-help .hint { margin-top: 4px; }
+
+.mcp-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 8px;
+	padding: 26px 20px;
+	border: 1px dashed var(--line);
+	border-radius: 12px;
+	background: var(--panel);
+	color: var(--muted);
+	font-size: 11.5px;
+	line-height: 1.55;
+}
+.mcp-empty > svg { width: 20px; height: 20px; color: var(--accent); }
+.mcp-empty strong { color: var(--text); font-size: 13px; }
+.mcp-empty p { margin: 0; max-width: 520px; }
+.mcp-empty button { margin-top: 4px; }
+
+.mcp-spin { animation: mcp-spin 0.9s linear infinite; }
+@keyframes mcp-spin {
+	to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+	.mcp-spin { animation: none; }
+}
+
+@media (max-width: 980px) {
+	.mcp-head { flex-direction: column; align-items: stretch; }
+	.mcp-head-actions { justify-content: flex-start; }
+	.mcp-form-row { flex-direction: column; align-items: stretch; }
+	.mcp-form-row .mcp-field { flex: 1 1 auto; }
+	.mcp-check { padding-bottom: 0; }
+	.mcp-editor,
+	.mcp-help { padding: 12px; }
+}

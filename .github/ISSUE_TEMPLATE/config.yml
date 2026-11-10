@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 安全问题
+    url: https://github.com/895252509/turn-pi/security/advisories/new
+    about: 别开公开 issue，走私密报告（见 SECURITY.md）

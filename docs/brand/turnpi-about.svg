@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Turn Pi — About icon, 128 × 128.
+
+  This is the app-icon composition used by Settings → About: cream ground, the
+  mark scaled to the full 128 px width, and the red T's glow left on. It is the
+  raster source for web/public/brand-mark-128.png (displayed at 36 × 36).
+
+  The mark is 120 × 96 in the brand grid. Scaling by 128/120 keeps the 5:4
+  aspect and leaves 12.8 px cream above and below; the sides touch the tile edge,
+  which is intentional — the glow clips into the tile, not outside it.
+
+  Glow values match the splash / turnpi-t.svg:
+      2.5 / 7 / 14 blur, #FF5030 100 % → #E8432B 80 % → #E8432B 50 %.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128"
+     shape-rendering="crispEdges" role="img" aria-label="Turn Pi">
+  <title>Turn Pi</title>
+
+  <rect x="0" y="0" width="128" height="128" fill="#F6F3EC"/>
+
+  <defs>
+    <filter id="turnpi-about-glow" x="-60%" y="-60%" width="220%" height="220%"
+            filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.5"
+                    flood-color="#FF5030" flood-opacity="1" result="core"/>
+      <feDropShadow in="core" dx="0" dy="0" stdDeviation="7"
+                    flood-color="#E8432B" flood-opacity="0.8" result="light"/>
+      <feDropShadow in="light" dx="0" dy="0" stdDeviation="14"
+                    flood-color="#E8432B" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <g transform="translate(0 12.8) scale(1.0666666667)">
+    <!-- layer 1: red T, with light -->
+    <g fill="#E8432B" filter="url(#turnpi-about-glow)">
+      <rect x="0" y="12" width="72" height="24"/>
+      <rect x="24" y="36" width="24" height="72"/>
+    </g>
+
+    <!-- layer 2: Pi, black 28 % -->
+    <g fill="#000000" opacity="0.28">
+      <rect x="24" y="12" width="72" height="24"/>
+      <rect x="72" y="36" width="24" height="24"/>
+      <rect x="24" y="36" width="24" height="72"/>
+      <rect x="48" y="60" width="24" height="24"/>
+      <rect x="96" y="60" width="24" height="48"/>
+    </g>
+  </g>
+</svg>

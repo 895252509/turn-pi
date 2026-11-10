@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Turn Pi — splash preview</title>
+<style>
+	body { margin:0; background:#ddd8cc; font:13px/1.6 ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif; }
+	.wrap { display:flex; }
+	.frame { position:relative; width:50vw; height:100vh; overflow:hidden; }
+	.label { position:absolute; left:16px; top:14px; z-index:5; font:600 10px/1 ui-monospace,monospace;
+		letter-spacing:.12em; text-transform:uppercase; opacity:.45; }
+	.frame[data-theme='dark'] .label { color:#edeae3; }
+	.frame[data-theme='light'] .label { color:#101010; }
+</style>
+<!-- 样式与标记逐字抠自 web/index.html -->
+<style>
+			#turnpi-splash {
+				position: fixed;
+				inset: 0;
+				z-index: 2147483647;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-direction: column;
+				gap: 22px;
+				transition: opacity 240ms ease;
+				-webkit-user-select: none;
+				user-select: none;
+			}
+			/* 默认深色；data-theme 由上面的内联脚本在任何绘制之前写好 */
+			#turnpi-splash { background: #16181c; color: #edeae3; }
+			.frame[data-theme='light'] #turnpi-splash { background: #f6f3ec; color: #101010; }
+
+			.frame #turnpi-splash[data-done] { opacity: 0; pointer-events: none; }
+
+			.turnpi-splash-mark {
+				position: relative;
+				width: 144px;
+				height: 144px;
+				flex: none;
+			}
+			.turnpi-splash-mark svg {
+				display: block;
+				width: 100%;
+				height: 100%;
+				shape-rendering: crispEdges;
+			}
+			/* 两层都在内联 SVG 里：层 1 红 T（带 filter 发光），层 2 黑 Pi 盖上来。
+			   幽灵用 fill="currentColor"，深色主题自动白幽灵、浅色自动黑幽灵。 */
+
+			/*
+				扫光：一条斜向高光在标记的轮廓内滑过。
+				mask 用的是同一组矩形的剪影（data URI），所以光只在字里走，
+				不会糊到背景上——这是"扫光"和"泛光"的区别。
+			*/
+			.turnpi-splash-shine {
+				--silhouette: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%27-16%20-16%20152%20152%27%3E%3Cg%20fill=%27%23000%27%3E%3Crect%20x=%270%27%20y=%2712%27%20width=%2796%27%20height=%2724%27/%3E%3Crect%20x=%2724%27%20y=%2736%27%20width=%2724%27%20height=%2772%27/%3E%3Crect%20x=%2772%27%20y=%2736%27%20width=%2724%27%20height=%2724%27/%3E%3Crect%20x=%2748%27%20y=%2760%27%20width=%2724%27%20height=%2724%27/%3E%3Crect%20x=%2796%27%20y=%2760%27%20width=%2724%27%20height=%2748%27/%3E%3C/g%3E%3C/svg%3E");
+				position: absolute;
+				inset: 0;
+				pointer-events: none;
+				background: linear-gradient(
+					105deg,
+					rgba(255, 255, 255, 0) 34%,
+					rgba(255, 255, 255, 0.92) 50%,
+					rgba(255, 255, 255, 0) 66%
+				);
+				background-size: 300% 100%;
+				background-repeat: no-repeat;
+				background-position: 150% 0;
+				-webkit-mask-image: var(--silhouette);
+				mask-image: var(--silhouette);
+				-webkit-mask-size: 100% 100%;
+				mask-size: 100% 100%;
+				-webkit-mask-repeat: no-repeat;
+				mask-repeat: no-repeat;
+				animation: turnpi-shine 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+			}
+
+			@keyframes turnpi-shine {
+				0% { background-position: 150% 0; }
+				65%, 100% { background-position: -60% 0; }
+			}
+
+			.turnpi-splash-word {
+				font: 600 13px/1 ui-sans-serif, -apple-system, 'Segoe UI', Roboto, sans-serif;
+				letter-spacing: 0.34em;
+				text-transform: uppercase;
+				opacity: 0.72;
+				padding-left: 0.34em; /* 补掉字间距在右边多出的一截，视觉居中 */
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				.turnpi-splash-shine { animation: none; opacity: 0; }
+			}
+		</style>
+</head><body><div class="wrap">
+	<div class="frame" data-theme="dark">
+		<span class="label">dark · data-theme="dark"</span>
+		<div id="turnpi-splash" role="status" aria-label="正在加载 Turn Pi">
+			<div class="turnpi-splash-mark"><svg viewBox="-16 -16 152 152" aria-hidden="true" focusable="false">
+					<defs>
+						<!-- 层 1 的光。feDropShadow 是几何滤镜，比 CSS box-shadow 可靠：
+						     后者只作用于 HTML 盒子，前者在任何 SVG 渲染器里都在。 -->
+						<filter id="turnpi-splash-glow" x="-60%" y="-60%" width="220%" height="220%"
+							filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+							<feDropShadow dx="0" dy="0" stdDeviation="2.5"
+								flood-color="#FF5030" flood-opacity="1" result="core" />
+							<feDropShadow in="core" dx="0" dy="0" stdDeviation="7"
+								flood-color="#E8432B" flood-opacity="0.8" result="light" />
+							<feDropShadow in="light" dx="0" dy="0" stdDeviation="14"
+								flood-color="#E8432B" flood-opacity="0.5" />
+						</filter>
+					</defs>
+					<!-- 层 1：红色 T + 光 -->
+					<g fill="#E8432B" filter="url(#turnpi-splash-glow)">
+						<rect x="0" y="12" width="72" height="24" />
+						<rect x="24" y="36" width="24" height="72" />
+					</g>
+					<!-- 层 2：黑色 28% 的 Pi，盖在光上面 -->
+					<g fill="currentColor" opacity="0.28">
+						<rect x="24" y="12" width="72" height="24" />
+						<rect x="72" y="36" width="24" height="24" />
+						<rect x="24" y="36" width="24" height="72" />
+						<rect x="48" y="60" width="24" height="24" />
+						<rect x="96" y="60" width="24" height="48" />
+					</g>
+				</svg><span class="turnpi-splash-shine" aria-hidden="true"></span></div>
+			<div class="turnpi-splash-word">Turn Pi</div>
+		</div>
+	</div>
+	<div class="frame" data-theme="light">
+		<span class="label">light · data-theme="light"</span>
+		<div id="turnpi-splash" role="status" aria-label="正在加载 Turn Pi">
+			<div class="turnpi-splash-mark"><svg viewBox="-16 -16 152 152" aria-hidden="true" focusable="false">
+					<defs>
+						<!-- 层 1 的光。feDropShadow 是几何滤镜，比 CSS box-shadow 可靠：
+						     后者只作用于 HTML 盒子，前者在任何 SVG 渲染器里都在。 -->
+						<filter id="turnpi-splash-glow" x="-60%" y="-60%" width="220%" height="220%"
+							filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+							<feDropShadow dx="0" dy="0" stdDeviation="2.5"
+								flood-color="#FF5030" flood-opacity="1" result="core" />
+							<feDropShadow in="core" dx="0" dy="0" stdDeviation="7"
+								flood-color="#E8432B" flood-opacity="0.8" result="light" />
+							<feDropShadow in="light" dx="0" dy="0" stdDeviation="14"
+								flood-color="#E8432B" flood-opacity="0.5" />
+						</filter>
+					</defs>
+					<!-- 层 1：红色 T + 光 -->
+					<g fill="#E8432B" filter="url(#turnpi-splash-glow)">
+						<rect x="0" y="12" width="72" height="24" />
+						<rect x="24" y="36" width="24" height="72" />
+					</g>
+					<!-- 层 2：黑色 28% 的 Pi，盖在光上面 -->
+					<g fill="currentColor" opacity="0.28">
+						<rect x="24" y="12" width="72" height="24" />
+						<rect x="72" y="36" width="24" height="24" />
+						<rect x="24" y="36" width="24" height="72" />
+						<rect x="48" y="60" width="24" height="24" />
+						<rect x="96" y="60" width="24" height="48" />
+					</g>
+				</svg><span class="turnpi-splash-shine" aria-hidden="true"></span></div>
+			<div class="turnpi-splash-word">Turn Pi</div>
+		</div>
+	</div>
+</div></body></html>

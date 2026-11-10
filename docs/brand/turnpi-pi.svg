@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Turn Pi — layer 2 of 2: upstream Pi, pure black at 28 %, drawn on top of the
+  red T (turnpi-t.svg).
+
+  No filter, no glow of its own. It stays a flat translucent black on purpose:
+  the only thing it should do is *absorb* the light underneath, so where it
+  overlaps the T the glow dims and its outline reads as a shadow across the light.
+  Give it a shadow of its own and the layering collapses.
+
+  Same 4 x 4 grid as upstream Pi — nothing added, nothing moved. Canvas is
+  -16..136 so it lines up with layer 1.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 152 152" width="152" height="152"
+     shape-rendering="crispEdges" role="img" aria-label="Turn Pi — Pi layer">
+  <title>Turn Pi — layer 2 (Pi, 28 % black)</title>
+  <g fill="#000000" opacity="0.28">
+    <rect x="24" y="12" width="72" height="24"/>
+    <rect x="72" y="36" width="24" height="24"/>
+    <rect x="24" y="36" width="24" height="72"/>
+    <rect x="48" y="60" width="24" height="24"/>
+    <rect x="96" y="60" width="24" height="48"/>
+  </g>
+</svg>

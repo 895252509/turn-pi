@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Turn Pi — reference: upstream Pi on the same tight grid, no added block.
+  Reference only — do not ship this file.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120"
+     shape-rendering="crispEdges" role="img" aria-label="Pi logo (reference)">
+  <title>Pi logo (reference)</title>
+  <g fill="#000000" opacity="0.28">
+    <rect x="24" y="12" width="72" height="24"/>
+    <rect x="72" y="36" width="24" height="24"/>
+    <rect x="24" y="36" width="24" height="72"/>
+    <rect x="48" y="60" width="24" height="24"/>
+    <rect x="96" y="60" width="24" height="48"/>
+  </g>
+</svg>

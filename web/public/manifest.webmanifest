@@ -1,0 +1,30 @@
+{
+	"name": "Turn Pi",
+	"short_name": "Turn Pi",
+	"description": "A web UI for the Pi coding agent.",
+	"start_url": "/",
+	"scope": "/",
+	"display": "standalone",
+	"background_color": "#F6F3EC",
+	"theme_color": "#E8432B",
+	"icons": [
+		{
+			"src": "/icon.svg",
+			"type": "image/svg+xml",
+			"sizes": "any",
+			"purpose": "any"
+		},
+		{
+			"src": "/icon-tile.svg",
+			"type": "image/svg+xml",
+			"sizes": "any",
+			"purpose": "any"
+		},
+		{
+			"src": "/icon-maskable.svg",
+			"type": "image/svg+xml",
+			"sizes": "any",
+			"purpose": "maskable"
+		}
+	]
+}

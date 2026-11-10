@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Turn Pi — tight crop. Mark touches the left and right edges on purpose.
+
+  Canvas 120 x 120, module 24, 5 columns exactly. Vertically the mark is 96 tall so
+  there are 12 px top and bottom — that is what makes the file square, not padding.
+
+  Use this one where the icon has to earn its pixels: favicon, browser tab,
+  inline next to a wordmark. At 16 px display each module is 3.2 px and no width is
+  wasted on margin.
+
+  Do NOT use this one where the platform draws its own rounded mask (iOS, macOS
+  dock, Android adaptive, Discord, GitHub org avatar) — the corners would clip the
+  T's crossbar and the Pi's leg. Use turnpi-tile.svg there.
+
+  Two colours:
+      layer 1  red #E8432B, solid       — the T
+      layer 2  black #000000, 28 %      — upstream Pi on top
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120"
+     shape-rendering="crispEdges" role="img" aria-label="Turn Pi">
+  <title>Turn Pi</title>
+
+  <!-- layer 1: the red T -->
+  <g fill="#E8432B">
+    <rect x="0"  y="12" width="72" height="24"/>
+    <rect x="24" y="36" width="24" height="72"/>
+  </g>
+
+  <!-- layer 2: Pi, pure black, 28 % -->
+  <g fill="#000000" opacity="0.28">
+    <rect x="24" y="12" width="72" height="24"/>
+    <rect x="72" y="36" width="24" height="24"/>
+    <rect x="24" y="36" width="24" height="72"/>
+    <rect x="48" y="60" width="24" height="24"/>
+    <rect x="96" y="60" width="24" height="48"/>
+  </g>
+</svg>
