@@ -888,7 +888,7 @@ export interface CredentialTestResult {
 	message: string;
 }
 
-function injectionFor(
+export function injectionFor(
 	record: Pick<CredentialRecord, 'kind' | 'headerName' | 'headerPrefix' | 'username' | 'queryParam'>,
 	secret: string,
 	headers: Record<string, string>,
@@ -903,7 +903,10 @@ function injectionFor(
 		return;
 	}
 	const name = record.headerName || (record.kind === 'api-key' ? 'X-API-Key' : 'Authorization');
-	headers[name.toLowerCase()] = `${record.headerPrefix ?? (record.kind === 'bearer' ? 'Bearer ' : '')}${secret}`;
+	// 用 || 而不是 ??：界面上的前缀输入框清空后存的是空字符串，不是 undefined。
+	// 空字符串配上 bearer 会发出 `Authorization: <裸 token>`，服务端一律 401，
+	// 而报错看起来像 token 无效——留空就按 bearer 的默认前缀走。
+	headers[name.toLowerCase()] = `${record.headerPrefix || (record.kind === 'bearer' ? 'Bearer ' : '')}${secret}`;
 }
 
 export async function testCredential(input: unknown): Promise<CredentialTestResult> {

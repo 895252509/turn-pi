@@ -42,6 +42,7 @@ jobs:
         run: |
           npm run --silent check:agent-card
           npm run --silent check:agent-spec
+          npm run --silent check:credentials
           npm run --silent check:workspace-tools
           npm run --silent check:git-panel
           npm run --silent check:worktree-deps

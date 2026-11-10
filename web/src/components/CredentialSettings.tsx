@@ -469,7 +469,7 @@ export function CredentialSettings() {
 									/>
 								</div>
 								<div className="settings-field">
-									<label htmlFor="credential-prefix">Header 前缀（可选）</label>
+									<label htmlFor="credential-prefix">Header 前缀（bearer 留空 = Bearer）</label>
 									<input
 										id="credential-prefix"
 										value={form.headerPrefix}

@@ -39,6 +39,7 @@
 		"check:agent-card": "node scripts/check-agent-card.mjs",
 		"check:agent-spec": "node scripts/check-agent-spec.mjs",
 		"check:mcp": "node scripts/check-mcp.mjs",
+		"check:credentials": "node scripts/check-credentials.mjs",
 		"check:worktree-guidance": "node scripts/check-worktree-guidance.mjs"
 	},
 	"dependencies": {
